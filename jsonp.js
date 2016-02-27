@@ -3,12 +3,20 @@
 var $jsonp = (function(){
   var that = {};
 
-  that.send = function(src, options) {
-    var options = options || {},
+  that.send = function(src, opt) {
+    var options = opt || {},
       callback_name = options.callbackName || 'callback',
       on_success = options.onSuccess || function(){},
       on_timeout = options.onTimeout || function(){},
-      timeout = options.timeout || 10;
+      timeout = options.timeout || 10,
+      params = options.data || {};
+
+    var query = "?";
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+            query += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]) + "&";
+        }
+    }
 
     var timeout_trigger = window.setTimeout(function(){
       window[callback_name] = function(){};
@@ -23,7 +31,7 @@ var $jsonp = (function(){
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.async = true;
-    script.src = src;
+    script.src = src + query;
 
     document.getElementsByTagName('head')[0].appendChild(script);
   };
